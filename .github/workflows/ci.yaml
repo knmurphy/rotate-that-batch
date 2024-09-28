@@ -27,9 +27,11 @@ jobs:
         cat pyproject.toml || echo "pyproject.toml not found"
     - name: Install dependencies
       run: |
-        pip install poetry
-    - name: Sort imports
+        poetry install --with dev
+
+    - name: Run isort
       run: poetry run isort .
+
     - name: Run tests
       run: poetry run pytest
     - name: Check formatting

@@ -16,10 +16,19 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install ffmpeg
       run: sudo apt-get update && sudo apt-get install -y ffmpeg
+    - name: Debug information
+      run: |
+        echo "Current directory:"
+        pwd
+        echo "Directory contents:"
+        ls -la
+        echo "pyproject.toml contents (if exists):"
+        cat pyproject.toml || echo "pyproject.toml not found"
     - name: Install dependencies
       run: |
         pip install poetry
-        poetry install
+        poetry config virtualenvs.create false
+        poetry install --no-interaction --no-ansi
     - name: Run tests
       run: poetry run pytest
     - name: Check formatting

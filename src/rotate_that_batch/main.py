@@ -1,68 +1,49 @@
+from typing import List, Tuple
+from pathlib import Path
 from textual.app import App, ComposeResult
-from textual.containers import Container
-from textual.widgets import Button, Input, Select, Static
+from textual.widgets import Button, DirectoryTree, Footer, Header, Static
+from textual.containers import Container, Horizontal
+from .video_utils import rotate_video, get_video_files
 
-from . import video_utils
-from .logger import logger
-
-
-class RotateThatBatchApp(App):
-    CSS = """
-    Screen {
-        align: center middle;
-    }
-
-    #main {
-        width: 80%;
-        height: auto;
-        border: solid green;
-        padding: 1 2;
-    }
-
-    Button {
-        width: 100%;
-    }
-    """
+class RotateThatBatch(App):
+    CSS_PATH = "rotate_that_batch.css"
+    BINDINGS = [("d", "toggle_dark", "Toggle dark mode")]
 
     def compose(self) -> ComposeResult:
+        yield Header()
         yield Container(
-            Static("Welcome to Rotate That Batch!", id="title"),
-            Input(placeholder="Enter path to video directory...", id="input"),
-            Select([(90, "90°"), (180, "180°"), (270, "270°")], id="angle", value=90),
-            Button("Preview", id="preview"),
-            Button("Rotate", id="rotate"),
-            Static(id="output"),
-            id="main",
+            Horizontal(
+                DirectoryTree(".", id="input_dir"),
+                DirectoryTree(".", id="output_dir"),
+            ),
+            Static("Select input and output directories", id="status_text"),
+            Button("Rotate Videos", id="rotate_button"),
         )
+        yield Footer()
 
-    def on_button_pressed(self, event: Button.Pressed) -> None:
-        directory = self.query_one("#input").value
-        angle = self.query_one("#angle").value
-        video_files = video_utils.get_video_files(directory)
+    rotation_options: List[Tuple[str, object]] = [("90", 90), ("180", 180), ("270", 270)]
 
-        if not video_files:
-            self.query_one("#output").update(
-                "No video files found in the selected folder."
-            )
-            logger.warning(f"No video files found in directory: {directory}")
-            return
+    def on_mount(self) -> None:
+        self.input_dir = self.query_one("#input_dir", DirectoryTree)
+        self.output_dir = self.query_one("#output_dir", DirectoryTree)
+        self.status_text = self.query_one("#status_text", Static)
 
-        if event.button.id == "preview":
-            logger.info(
-                f"Starting preview for directory: {directory} with angle: {angle}"
-            )
-            video_utils.preview_rotations(video_files, angle)
-            self.query_one("#output").update("Preview complete!")
-        elif event.button.id == "rotate":
-            logger.info(
-                f"Starting rotation process for directory: {directory} with angle: {angle}"
-            )
-            for video in video_files:
-                video_utils.rotate_video(video, angle)
-            self.query_one("#output").update(f"Rotated {len(video_files)} videos.")
-            logger.info(f"Rotation complete. Processed {len(video_files)} videos.")
+    def on_button_pressed(self) -> None:
+        input_dir = Path(self.input_dir.path if hasattr(self.input_dir, 'path') else str(self.input_dir))
+        output_dir = Path(self.output_dir.path if hasattr(self.output_dir, 'path') else str(self.output_dir))
+        
+        self.update_status(f"Processing videos in {input_dir}")
+        
+        video_files = get_video_files(str(input_dir))
+        for video_file in video_files:
+            rotate_video(video_file, 90, str(output_dir))
+        
+        self.update_status(f"Videos processed. Output directory: {output_dir}")
+        self.update_status("Done!")
 
+    def update_status(self, message: str) -> None:
+        self.status_text.update(message)
 
 if __name__ == "__main__":
-    app = RotateThatBatchApp()
+    app = RotateThatBatch()
     app.run()

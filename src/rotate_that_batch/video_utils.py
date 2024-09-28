@@ -3,7 +3,8 @@ import subprocess
 import sys
 from typing import List, Optional
 
-import exiftool
+import exiftool  # type: ignore
+import typer
 
 from .logger import logger
 
@@ -69,20 +70,20 @@ def get_video_files(directory: str) -> List[str]:
     return video_files
 
 
-def rotate_video(video_file: str, angle: int, output_dir: str = None) -> None:
+def rotate_video(input_file: str, angle: int, output_dir: Optional[str] = None) -> None:
     """Rotate a video file by the specified angle."""
     if output_dir:
         os.makedirs(output_dir, exist_ok=True)
-        output_file = os.path.join(output_dir, os.path.basename(video_file))
+        output_file = os.path.join(output_dir, os.path.basename(input_file))
     else:
-        output_file = video_file
+        output_file = input_file
 
     try:
         with exiftool.ExifToolHelper() as et:
-            et.execute(f"-Rotation={angle}", "-overwrite_original", video_file)
-        logger.info(f"Successfully rotated video: {video_file} by {angle} degrees.")
+            et.execute(f"-Rotation={angle}", "-overwrite_original", input_file)
+        logger.info(f"Successfully rotated video: {input_file} by {angle} degrees.")
     except Exception as e:
-        logger.error(f"Failed to rotate video: {video_file}. Error: {str(e)}")
+        logger.error(f"Failed to rotate video: {input_file}. Error: {str(e)}")
         raise
 
 

@@ -1,6 +1,7 @@
 from textual.app import App, ComposeResult
-from textual.widgets import Button, Input, Static, Select
 from textual.containers import Container
+from textual.widgets import Button, Input, Select, Static
+
 from . import video_utils
 from .logger import logger
 

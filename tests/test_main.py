@@ -1,12 +1,14 @@
-import pytest
-from typer.testing import CliRunner
-from rotate_that_batch.cli import app
-from rotate_that_batch.main import RotateThatBatchApp
-from rotate_that_batch import video_utils, config
-from rotate_that_batch.logger import logger
+import configparser
 import os
 import tempfile
-import configparser
+
+import pytest
+from typer.testing import CliRunner
+
+from rotate_that_batch import config, video_utils
+from rotate_that_batch.cli import app
+from rotate_that_batch.logger import logger
+from rotate_that_batch.main import RotateThatBatchApp
 
 runner = CliRunner()
 

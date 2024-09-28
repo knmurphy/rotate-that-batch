@@ -1,6 +1,7 @@
-from rich.logging import RichHandler
 import logging
 import sys
+
+from rich.logging import RichHandler
 
 
 def setup_logger():

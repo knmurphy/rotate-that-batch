@@ -1,6 +1,7 @@
 import typer
 from rich.console import Console
 from rich.progress import Progress
+
 from . import video_utils
 from .config import get_config_value, set_config_value
 from .logger import logger

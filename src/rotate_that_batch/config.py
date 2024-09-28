@@ -1,5 +1,6 @@
 import configparser
 import os
+
 from .logger import logger
 
 CONFIG_FILE = os.path.expanduser("~/.rotate_that_batch.ini")

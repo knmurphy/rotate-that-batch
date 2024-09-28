@@ -10,7 +10,7 @@ packages = [{include = "rotate_that_batch", from = "src"}]
 [tool.poetry.dependencies]
 python = "^3.12"
 textual = "^0.38.1"
-rich = "^13.5.2"
+rich = "^13.0.0"  # Use the latest version available
 typer = "^0.9.0"
 pyexiftool = "^0.5.5"
 

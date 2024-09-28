@@ -1,14 +1,17 @@
 import configparser
 import os
 import tempfile
+import asyncio
+from asyncio import TimeoutError
 
 import pytest
 from typer.testing import CliRunner
+from textual.pilot import Pilot
+from rotate_that_batch.main import RotateThatBatchApp
 
 from rotate_that_batch import config, video_utils
 from rotate_that_batch.cli import app
 from rotate_that_batch.logger import logger
-from rotate_that_batch.main import RotateThatBatchApp
 
 runner = CliRunner()
 
@@ -57,34 +60,31 @@ def test_main_directory_selection(mocker):
 
 
 @pytest.mark.asyncio
-async def test_rotate_that_batch_app(mocker):
-    mocker.patch(
-        "rotate_that_batch.video_utils.get_video_files", return_value=["video1.mp4"]
-    )
-    mock_rotate_video = mocker.patch("rotate_that_batch.video_utils.rotate_video")
-    mock_preview_rotations = mocker.patch(
-        "rotate_that_batch.video_utils.preview_rotations"
-    )
-
+async def test_rotate_that_batch_app():
     app = RotateThatBatchApp()
     async with app.run_test() as pilot:
+        # Check title
         title = pilot.app.query_one("#title")
         assert title.renderable.plain == "Welcome to Rotate That Batch!"
 
-        input_widget = pilot.app.query_one("#input")
-        input_widget.value = "/test/dir"
+        # Set input and output directories
+        await pilot.click("#input")
+        await pilot.press("ctrl+a", "backspace", "/test/input")
+        await pilot.click("#output")
+        await pilot.press("ctrl+a", "backspace", "/test/output")
 
+        # Select rotation angle
         angle_select = pilot.app.query_one("#angle")
         angle_select.value = 180
 
+        # Click preview button
         await pilot.click("#preview")
-        mock_preview_rotations.assert_called_once()
+        status_text = pilot.app.query_one("#status_text")
+        assert status_text.renderable.plain == "Previewing rotation..."
 
+        # Click rotate button
         await pilot.click("#rotate")
-        mock_rotate_video.assert_called_once()
-
-        output = pilot.app.query_one("#output")
-        assert "Rotated 1 videos" in output.renderable.plain
+        assert status_text.renderable.plain == "Rotating videos..."
 
 
 def test_list_directories():

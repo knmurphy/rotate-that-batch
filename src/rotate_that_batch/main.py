@@ -7,7 +7,7 @@ from textual.containers import Container
 console = Console()
 app = typer.Typer()
 
-class YourApp(App):
+class RotateThatBatchApp(App):
     CSS = """
     Screen {
         align: center middle;
@@ -27,9 +27,9 @@ class YourApp(App):
 
     def compose(self) -> ComposeResult:
         yield Container(
-            Static("Welcome to Your Project!", id="title"),
-            Input(placeholder="Enter something...", id="input"),
-            Button("Submit", id="submit"),
+            Static("Welcome to Rotate That Batch!", id="title"),
+            Input(placeholder="Enter batch to rotate...", id="input"),
+            Button("Rotate", id="submit"),
             Static(id="output"),
             id="main"
         )
@@ -37,16 +37,18 @@ class YourApp(App):
     def on_button_pressed(self, event: Button.Pressed) -> None:
         if event.button.id == "submit":
             input_value = self.query_one("#input").value
-            result = f"You entered: {input_value}"
+            result = f"Rotated batch: {input_value[::-1]}"  # Simple reverse for demonstration
             self.query_one("#output").update(result)
 
 @app.command()
-def main(name: str = typer.Option("World", help="Name to greet")):
+def main(batch: str = typer.Option("", help="Batch to rotate")):
     """
-    Run the main application.
+    Run the main application to rotate batches.
     """
-    console.print(f"Hello, [bold green]{name}[/bold green]!")
-    YourApp().run()
+    if batch:
+        console.print(f"Rotated batch: [bold green]{batch[::-1]}[/bold green]")
+    else:
+        RotateThatBatchApp().run()
 
 if __name__ == "__main__":
     app()

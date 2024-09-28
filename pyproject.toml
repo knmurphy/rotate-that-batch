@@ -1,14 +1,14 @@
 [tool.poetry]
-name = "your-project-name"
+name = "rotate-that-batch"
 version = "0.1.0"
-description = "A short description of your project"
-authors = ["Your Name <your.email@example.com>"]
+description = "When your videos are sideways, it's time to 'Rotate That Batch'."
+authors = ["Kevin N. Murphy <knmurphy@users.noreply.github.com>"]
 license = "MIT"
 readme = "README.md"
-packages = [{include = "your_project_name", from = "src"}]
+packages = [{include = "rotate_that_batch", from = "src"}]
 
 [tool.poetry.dependencies]
-python = "^3.7"
+python = "^3.12"
 textual = "^0.27.0"
 rich = "^13.3.5"
 typer = "^0.9.0"
@@ -24,4 +24,4 @@ requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.scripts]
-your-project-name = "your_project_name.main:app"
+rotate-that-batch = "rotate_that_batch.main:app"

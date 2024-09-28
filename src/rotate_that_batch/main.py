@@ -4,6 +4,7 @@ from textual.containers import Container
 from . import video_utils
 from .logger import logger
 
+
 class RotateThatBatchApp(App):
     CSS = """
     Screen {
@@ -30,7 +31,7 @@ class RotateThatBatchApp(App):
             Button("Preview", id="preview"),
             Button("Rotate", id="rotate"),
             Static(id="output"),
-            id="main"
+            id="main",
         )
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
@@ -39,20 +40,27 @@ class RotateThatBatchApp(App):
         video_files = video_utils.get_video_files(directory)
 
         if not video_files:
-            self.query_one("#output").update("No video files found in the selected folder.")
+            self.query_one("#output").update(
+                "No video files found in the selected folder."
+            )
             logger.warning(f"No video files found in directory: {directory}")
             return
 
         if event.button.id == "preview":
-            logger.info(f"Starting preview for directory: {directory} with angle: {angle}")
+            logger.info(
+                f"Starting preview for directory: {directory} with angle: {angle}"
+            )
             video_utils.preview_rotations(video_files, angle)
             self.query_one("#output").update("Preview complete!")
         elif event.button.id == "rotate":
-            logger.info(f"Starting rotation process for directory: {directory} with angle: {angle}")
+            logger.info(
+                f"Starting rotation process for directory: {directory} with angle: {angle}"
+            )
             for video in video_files:
                 video_utils.rotate_video(video, angle)
             self.query_one("#output").update(f"Rotated {len(video_files)} videos.")
             logger.info(f"Rotation complete. Processed {len(video_files)} videos.")
+
 
 if __name__ == "__main__":
     app = RotateThatBatchApp()

@@ -1,11 +1,7 @@
-import typer
-from rich.console import Console
 from textual.app import App, ComposeResult
 from textual.widgets import Button, Input, Static
 from textual.containers import Container
-
-console = Console()
-app = typer.Typer()
+from . import video_utils
 
 class RotateThatBatchApp(App):
     CSS = """
@@ -28,7 +24,7 @@ class RotateThatBatchApp(App):
     def compose(self) -> ComposeResult:
         yield Container(
             Static("Welcome to Rotate That Batch!", id="title"),
-            Input(placeholder="Enter batch to rotate...", id="input"),
+            Input(placeholder="Enter path to video directory...", id="input"),
             Button("Rotate", id="submit"),
             Static(id="output"),
             id="main"
@@ -36,19 +32,15 @@ class RotateThatBatchApp(App):
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
         if event.button.id == "submit":
-            input_value = self.query_one("#input").value
-            result = f"Rotated batch: {input_value[::-1]}"  # Simple reverse for demonstration
-            self.query_one("#output").update(result)
-
-@app.command()
-def main(batch: str = typer.Option("", help="Batch to rotate")):
-    """
-    Run the main application to rotate batches.
-    """
-    if batch:
-        console.print(f"Rotated batch: [bold green]{batch[::-1]}[/bold green]")
-    else:
-        RotateThatBatchApp().run()
+            directory = self.query_one("#input").value
+            video_files = video_utils.get_video_files(directory)
+            if not video_files:
+                self.query_one("#output").update("No video files found in the selected folder.")
+            else:
+                for video in video_files:
+                    video_utils.rotate_video(video, 90)  # Default to 90 degrees
+                self.query_one("#output").update(f"Rotated {len(video_files)} videos.")
 
 if __name__ == "__main__":
-    app()
+    app = RotateThatBatchApp()
+    app.run()

@@ -1,52 +1,34 @@
 name: CI
 
-on: [push, pull_request]
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
 
 jobs:
-  test:
+  build:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: ["3.12"]
-
     steps:
-    - uses: actions/checkout@v3
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v4
+    - uses: actions/checkout@v2
+    - name: Set up Python
+      uses: actions/setup-python@v2
       with:
-        python-version: ${{ matrix.python-version }}
-    - name: Install ffmpeg
-      run: sudo apt-get update && sudo apt-get install -y ffmpeg
-    - name: Debug information
+        python-version: '3.12'
+    - name: Install Poetry
       run: |
-        echo "Current directory:"
-        pwd
-        echo "Directory contents:"
-        ls -la
-        echo "pyproject.toml contents (if exists):"
-        cat pyproject.toml || echo "pyproject.toml not found"
+        curl -sSL https://install.python-poetry.org | python3 -
+        echo "$HOME/.local/bin" >> $GITHUB_PATH
     - name: Install dependencies
       run: |
         poetry install --with dev
-
     - name: Run isort
-      run: poetry run isort .
-
-    - name: Run tests
+      run: poetry run isort . --check-only
+    - name: Run black
+      run: poetry run black . --check
+    - name: Run flake8
+      run: poetry run flake8 .
+    - name: Run mypy
+      run: poetry run mypy .
+    - name: Run pytest
       run: poetry run pytest
-    - name: Check formatting
-      run: poetry run black --check .
-    - name: Check imports
-      run: poetry run isort --check-only .
-    - name: Type check
-      run: poetry run mypy src
-    - name: Lint
-      run: poetry run flake8 src tests
-    - name: Format with Black
-      run: poetry run black .
-    - name: Check for changes
-      run: |
-        if [[ `git status --porcelain` ]]; then
-          echo "isort made changes. Please run 'isort .' locally and commit the changes."
-          exit 1
-        fi

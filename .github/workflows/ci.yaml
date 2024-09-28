@@ -28,7 +28,8 @@ jobs:
     - name: Install dependencies
       run: |
         pip install poetry
-        poetry install
+    - name: Sort imports
+      run: poetry run isort .
     - name: Run tests
       run: poetry run pytest
     - name: Check formatting
@@ -44,6 +45,6 @@ jobs:
     - name: Check for changes
       run: |
         if [[ `git status --porcelain` ]]; then
-          echo "Black made changes. Please run 'black .' locally and commit the changes."
+          echo "isort made changes. Please run 'isort .' locally and commit the changes."
           exit 1
         fi

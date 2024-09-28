@@ -1,17 +1,17 @@
+import asyncio
 import configparser
 import os
 import tempfile
-import asyncio
 from asyncio import TimeoutError
 
 import pytest
-from typer.testing import CliRunner
 from textual.pilot import Pilot
-from rotate_that_batch.main import RotateThatBatchApp
+from typer.testing import CliRunner
 
 from rotate_that_batch import config, video_utils
 from rotate_that_batch.cli import app
 from rotate_that_batch.logger import logger
+from rotate_that_batch.main import RotateThatBatchApp
 
 runner = CliRunner()
 

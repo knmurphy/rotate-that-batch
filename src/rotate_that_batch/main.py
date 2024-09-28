@@ -1,6 +1,8 @@
 from textual.app import App, ComposeResult
-from textual.widgets import Button, Input, Static, Select
 from textual.containers import Container, Horizontal
+from textual.widget import Widget
+from textual.widgets import Button, Input, Select, Static
+
 
 class RotateThatBatchApp(App):
     CSS_PATH = "rotate_that_batch.css"
@@ -26,10 +28,13 @@ class RotateThatBatchApp(App):
             self.rotate_videos()
 
     def preview_rotation(self) -> None:
-        self.query_one("#status_text").update("Previewing rotation...")
+        status_text = self.query_one("#status_text", Static)
+        status_text.update("Previewing rotation...")
 
     def rotate_videos(self) -> None:
-        self.query_one("#status_text").update("Rotating videos...")
+        status_text = self.query_one("#status_text", Static)
+        status_text.update("Rotating videos...")
+
 
 if __name__ == "__main__":
     app = RotateThatBatchApp()
